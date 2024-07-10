@@ -4,11 +4,9 @@ import os
 import tempfile
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = os.path.join(tempfile.gettempdir(), 'uploads')
 
-# Create the upload folder if it doesn't exist
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+# Set UPLOAD_FOLDER to a temporary directory
+app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 
 @app.route('/')
 def index():
