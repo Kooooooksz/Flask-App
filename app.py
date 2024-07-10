@@ -1,12 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for
 import pandas as pd
-import os
-import tempfile
+import io
+import base64
 
 app = Flask(__name__)
-
-# Set UPLOAD_FOLDER to a temporary directory
-app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 
 @app.route('/')
 def index():
@@ -20,15 +17,21 @@ def upload_file():
     if file.filename == '':
         return redirect(request.url)
     if file and file.filename.endswith('.xlsx'):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(file_path)
-        return redirect(url_for('calculate_average', filename=file.filename))
+        file_content = file.read()  # Read file content into memory
+        encoded_content = base64.b64encode(file_content).decode('utf-8')  # Encode file content to base64
+        return redirect(url_for('calculate_average', file_content=encoded_content))
     return redirect(request.url)
 
-@app.route('/calculate/<filename>')
-def calculate_average(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    df = pd.read_excel(file_path)
+@app.route('/calculate')
+def calculate_average():
+    encoded_content = request.args.get('file_content')
+    if not encoded_content:
+        return redirect(url_for('index'))
+
+    # Decode the base64 string to bytes
+    file_content = base64.b64decode(encoded_content)
+    file_stream = io.BytesIO(file_content)
+    df = pd.read_excel(file_stream)
 
     kreditek = list(df["Kr."])
     jegyek = list(df["Jegyek"])
