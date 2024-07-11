@@ -36,8 +36,11 @@ def calculate_average():
     kreditek = list(df["Kr."])
     jegyek = list(df["Jegyek"])
 
+    for elem in jegyek:
+        print(str(elem))
+
     def utsozarpojel(szo):
-        index = 0
+        index = -1
         for i in range(len(szo)):
             if szo[i] == "(":
                 index = i
@@ -48,7 +51,7 @@ def calculate_average():
     osszkredit = sum(kreditek)
     teljesitettkredit = 0
     for i in range(len(kreditek)):
-        if kreditek[i] != 0 and int(jegyek[i][utsozarpojel(jegyek[i]) + 1]) != 1:
+        if kreditek[i] != 0 and str(jegyek[i]) != "nan" and int(jegyek[i][utsozarpojel(jegyek[i]) + 1]) != 1:
             szorzat += kreditek[i] * int(jegyek[i][utsozarpojel(jegyek[i]) + 1])
             hagyomanyos += int(jegyek[i][utsozarpojel(jegyek[i]) + 1])
             oszto += 1
